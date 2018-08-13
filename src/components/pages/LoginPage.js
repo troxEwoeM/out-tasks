@@ -1,12 +1,11 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import LoginForm from "../forms/LoginForm";
+import api from "../../api";
 
 class HomePage extends Component {
 
-    submit = (data) => {
-        return console.log(data);
-    };
+    submit = (data) => api.user.login(data);
 
     render() {
         return (

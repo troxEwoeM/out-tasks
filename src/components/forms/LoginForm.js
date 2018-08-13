@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Button, Form} from "semantic-ui-react";
+import {Button, Form, Message} from "semantic-ui-react";
 import validator from "validator";
 import InlineError from "../messages/InlineError";
 
@@ -11,14 +11,14 @@ class LoginForm extends Component {
             password: ''
         },
         loading: false,
-        errors: {}
+        errors: { }
     };
 
     onChange = e =>
-            this.setState({
-                ...this.state,
-                data: {...this.state.data, [e.target.name]: e.target.value}
-            });
+        this.setState({
+            ...this.state,
+            data: {...this.state.data, [e.target.name]: e.target.value}
+        });
 
     onSubmit = (e) => {
         e.preventDefault();
@@ -27,7 +27,10 @@ class LoginForm extends Component {
         if (Object.keys(errors).length === 0) {
             this.setState({loading: true});
             this.props.submit(this.state.data)
-               .catch(err => this.setState({errors: err.response.data.message, loading: false}));
+                .catch(err => {
+                    console.log(err.response.data);
+                    return this.setState({errors: err.response.data.errors, loading: false});
+                });
         }
     };
 
@@ -43,7 +46,7 @@ class LoginForm extends Component {
     render() {
         const {data, loading, errors} = this.state;
         return (
-            <Form onSubmit={this.onSubmit}>
+            <Form onSubmit={this.onSubmit} loading={loading}>
                 <Form.Field error={!!errors.email}>
                     <label htmlFor='email'>Email</label>
                     <input
@@ -65,10 +68,16 @@ class LoginForm extends Component {
                         placeholder="66350531"
                         value={data.password}
                         onChange={this.onChange}
-                     />
-                     {errors.password && <InlineError text={errors.password}/>}
+                    />
+                    {errors.password && <InlineError text={errors.password}/>}
                 </Form.Field>
                 <Button primary>Login</Button>
+                {errors.global && <Message negative>
+                    <Message.Header>
+                        Error
+                    </Message.Header>
+                    {errors.global}
+                </Message>}
             </Form>
         );
     }
